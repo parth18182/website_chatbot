@@ -18,8 +18,8 @@ export const chatWithWebsite = async (req, res) => {
       model: 'embed-english-v3.0',
       inputType: 'search_query', 
     });
+    
     const questionVector = embedResponse.embeddings[0];
-
     const rawChunks = await DocumentChunk.aggregate([
       {
         $vectorSearch: {

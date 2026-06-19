@@ -36,6 +36,7 @@ export const crawlWebsite = async (req, res) => {
             const currentUrl = queue.shift();
 
             if (visited.has(currentUrl)) continue;
+            
             if (robots && !robots.isAllowed(currentUrl, 'Bot')) continue;
 
             console.log(`Crawling and Indexing with Cohere: ${currentUrl}`);
