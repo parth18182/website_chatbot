@@ -3,7 +3,6 @@ import { chatWithWebsite } from '../controllers/chatController.js';
 
 const router = express.Router();
 
-// POST /api/chat
 router.post('/', chatWithWebsite);
 
 export default router;

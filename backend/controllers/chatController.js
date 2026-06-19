@@ -13,15 +13,13 @@ export const chatWithWebsite = async (req, res) => {
   try {
     console.log(`Received question: "${question}"`);
 
-    // 1. Get embedding for the question
     const embedResponse = await cohere.embed({
       texts: [question],
       model: 'embed-english-v3.0',
-      inputType: 'search_query', // Optimized for asking questions
+      inputType: 'search_query', 
     });
     const questionVector = embedResponse.embeddings[0];
 
-    // 2. Search MongoDB
     const rawChunks = await DocumentChunk.aggregate([
       {
         $vectorSearch: {
@@ -44,7 +42,6 @@ export const chatWithWebsite = async (req, res) => {
     const contextText = rawChunks.map(chunk => chunk.text).join("\n\n");
     const uniqueSources = [...new Set(rawChunks.map(chunk => chunk.url))];
 
-    // 3. Ask Cohere's Chat Model
     const prompt =
       "You are a helpful AI assistant. Answer the user's question using ONLY the provided website context below.\n" +
       "If the context does not contain the answer, reply exactly with: 'I don't know based on the provided website.'\n" +
@@ -53,7 +50,7 @@ export const chatWithWebsite = async (req, res) => {
       `Question: ${question}`;
 
     const chatResponse = await cohere.chat({
-      model: 'command-r-08-2024', // 🚀 The active, current model
+      model: 'command-r-08-2024', 
       message: prompt,
       temperature: 0.0
     });

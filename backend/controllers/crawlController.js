@@ -8,7 +8,6 @@ import DocumentChunk from '../models/DocumentChunk.js';
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const crawlWebsite = async (req, res) => {
-    // Initialize Cohere
     const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
 
     const { url } = req.body;
@@ -29,6 +28,7 @@ export const crawlWebsite = async (req, res) => {
 
         const maxPages = 5;
         const visited = new Set();
+
         const queue = [url];
         let totalChunksSaved = 0;
 
@@ -47,7 +47,6 @@ export const crawlWebsite = async (req, res) => {
                 const chunks = chunkText(result.cleanText, 1000, 200);
 
                 if (chunks.length > 0) {
-                    // 🚀 Cohere can process all chunks at once!
                     const embedResponse = await cohere.embed({
                         texts: chunks,
                         model: 'embed-english-v3.0',
