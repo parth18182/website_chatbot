@@ -1,9 +1,16 @@
 import axios from 'axios';
 import robotsParser from 'robots-parser';
+import { CohereClient } from 'cohere-ai';
 import { scrapePageContent, extractInternalLinks } from '../utils/scraper.js';
+import { chunkText } from '../utils/chunker.js';
+import DocumentChunk from '../models/DocumentChunk.js';
+
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const crawlWebsite = async (req, res) => {
+    // Initialize Cohere
+    const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
+
     const { url } = req.body;
 
     if (!url) {
@@ -12,56 +19,64 @@ export const crawlWebsite = async (req, res) => {
 
     try {
         const baseUrl = new URL(url).origin;
-        
         let robots = null;
         try {
             const { data: robotsTxt } = await axios.get(`${baseUrl}/robots.txt`);
             robots = robotsParser(`${baseUrl}/robots.txt`, robotsTxt);
         } catch (e) {
-            console.log("No robots.txt found or accessible. Proceeding with crawl.");
+            console.log("No robots.txt found. Proceeding.");
         }
 
-        const maxPages = 5; 
+        const maxPages = 5;
         const visited = new Set();
         const queue = [url];
-        const scrapedData = [];
+        let totalChunksSaved = 0;
 
         while (queue.length > 0 && visited.size < maxPages) {
             const currentUrl = queue.shift();
 
             if (visited.has(currentUrl)) continue;
+            if (robots && !robots.isAllowed(currentUrl, 'Bot')) continue;
 
-            if (robots && !robots.isAllowed(currentUrl, 'Bot')) {
-                console.log(`Skipping (Blocked by robots.txt): ${currentUrl}`);
-                continue;
-            }
-
-            console.log(`Crawling: ${currentUrl}`);
+            console.log(`Crawling and Indexing with Cohere: ${currentUrl}`);
             visited.add(currentUrl);
 
             const result = await scrapePageContent(currentUrl);
-            
+
             if (result && result.cleanText) {
-                scrapedData.push({
-                    url: currentUrl,
-                    text: result.cleanText
-                });
+                const chunks = chunkText(result.cleanText, 1000, 200);
+
+                if (chunks.length > 0) {
+                    // 🚀 Cohere can process all chunks at once!
+                    const embedResponse = await cohere.embed({
+                        texts: chunks,
+                        model: 'embed-english-v3.0',
+                        inputType: 'search_document',
+                    });
+
+                    const dbDocuments = chunks.map((chunk, index) => ({
+                        url: currentUrl,
+                        text: chunk,
+                        embedding: embedResponse.embeddings[index]
+                    }));
+
+                    await DocumentChunk.insertMany(dbDocuments);
+                    totalChunksSaved += chunks.length;
+                    console.log(`Successfully saved ${chunks.length} text chunks to MongoDB.`);
+                }
 
                 const newLinks = extractInternalLinks(result.html, currentUrl);
                 newLinks.forEach(link => {
-                    if (!visited.has(link) && !queue.includes(link)) {
-                        queue.push(link);
-                    }
+                    if (!visited.has(link) && !queue.includes(link)) queue.push(link);
                 });
             }
-
             await delay(1000);
         }
 
         return res.status(200).json({
-            message: "Crawl successful",
+            message: "Crawl and Cohere Indexing successful",
             pagesCrawled: visited.size,
-            data: scrapedData
+            totalChunksSaved: totalChunksSaved
         });
 
     } catch (error) {
