@@ -8,10 +8,10 @@ import DocumentChunk from '../models/DocumentChunk.js';
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const crawlWebsite = async (req, res) => {
+
     const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
-
     const { url } = req.body;
-
+    
     if (!url) {
         return res.status(400).json({ error: "URL is required" });
     }
