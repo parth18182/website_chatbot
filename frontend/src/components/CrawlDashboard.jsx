@@ -15,7 +15,7 @@ export default function CrawlDashboard({ onCrawlComplete }) {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/crawl', { url });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/crawl`, { url });
       
       if (response.status === 200) {
         onCrawlComplete(url); 

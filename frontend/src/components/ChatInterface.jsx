@@ -32,7 +32,7 @@ export default function ChatInterface({ url, onReset }) {
     setIsTyping(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/chat', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat`, {
         question: userQuestion,
         url: url 
       });
@@ -80,7 +80,7 @@ export default function ChatInterface({ url, onReset }) {
             <div key={index} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
 
               {msg.role === 'ai' && (
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0 mt-1">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
               )}
