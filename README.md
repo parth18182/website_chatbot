@@ -52,6 +52,10 @@ You must create a Vector Search Index on your target collection.
       "path": "embedding",
       "similarity": "cosine",
       "type": "vector"
+    },
+    {
+      "path": "url",
+      "type": "filter"
     }
   ]
 }
