@@ -67,7 +67,7 @@ export default function CrawlDashboard({ onCrawlComplete }) {
               </>
             ) : (
               <>
-                Go To Ai ChatBot <ArrowRight className="w-5 h-5" />
+                Go To ChatBot <ArrowRight className="w-5 h-5" />
               </>
             )}
           </button>
