@@ -73,6 +73,13 @@ MONGODB_URI=your_mongodb_connection_string
 COHERE_API_KEY=your_cohere_api_key
 ```
 
+Create a file named `.env` inside your `/frontend` directory:
+
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+
 ### 4. Installation & Local Startup
 
 Open two terminal windows to run the servers in parallel.
