@@ -82,7 +82,7 @@ Open two terminal windows to run the servers in parallel.
 ```bash
 cd backend
 npm install
-npm run dev
+nodemon server.js
 ```
 
 #### Terminal 2 (Frontend)
