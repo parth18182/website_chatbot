@@ -135,7 +135,7 @@ To keep responses factual and cited:
 * We enforce a temperature of `0.0` to reduce the model's creativity and force deterministic outputs.
 * We pull unique source URLs directly from the database metadata and deliver them alongside the text so the frontend can generate dynamic, hyperlinked citations.
 
-## 💡 Honest Evaluation & Future Improvements
+## 💡 Limitations & Future Improvements
 
 As requested, here is a transparent look at current limitations and how I would engineer fixes for a production environment:
 
