@@ -24,9 +24,7 @@ export default function ChatInterface({ url, onReset }) {
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-
     const userQuestion = input.trim();
-
     setMessages(prev => [...prev, { role: 'user', text: userQuestion }]);
     setInput('');
     setIsTyping(true);
@@ -34,7 +32,7 @@ export default function ChatInterface({ url, onReset }) {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat`, {
         question: userQuestion,
-        url: url 
+        url: url
       });
       setMessages(prev => [...prev, {
         role: 'ai',
@@ -56,7 +54,6 @@ export default function ChatInterface({ url, onReset }) {
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -86,8 +83,8 @@ export default function ChatInterface({ url, onReset }) {
               )}
 
               <div className={`max-w-[80%] rounded-2xl px-5 py-4 shadow-sm ${msg.role === 'user'
-                  ? 'bg-blue-600 text-white rounded-tr-sm'
-                  : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'
+                ? 'bg-blue-600 text-white rounded-tr-sm'
+                : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'
                 }`}>
                 <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
 
@@ -155,7 +152,6 @@ export default function ChatInterface({ url, onReset }) {
           </form>
         </div>
       </div>
-
     </div>
   );
 }
