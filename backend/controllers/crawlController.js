@@ -8,10 +8,9 @@ import DocumentChunk from '../models/DocumentChunk.js';
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const crawlWebsite = async (req, res) => {
-
+    console.log("CRAWL API HIT");
     const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
     const { url } = req.body;
-    
     if (!url) {
         return res.status(400).json({ error: "URL is required" });
     }
@@ -35,18 +34,22 @@ export const crawlWebsite = async (req, res) => {
         while (queue.length > 0 && visited.size < maxPages) {
             const currentUrl = queue.shift();
 
+            console.log('current url', currentUrl)
+            // console.log('visited',visited)
+
             if (visited.has(currentUrl)) continue;
-            
+
             if (robots && !robots.isAllowed(currentUrl, 'Bot')) continue;
 
             console.log(`Crawling and Indexing with Cohere: ${currentUrl}`);
             visited.add(currentUrl);
 
             const result = await scrapePageContent(currentUrl);
+            // console.log('result',result)
 
             if (result && result.cleanText) {
                 const chunks = chunkText(result.cleanText, 1000, 200);
-
+                // console.log('chunks',chunks)
                 if (chunks.length > 0) {
                     const embedResponse = await cohere.embed({
                         texts: chunks,
@@ -69,6 +72,8 @@ export const crawlWebsite = async (req, res) => {
                 newLinks.forEach(link => {
                     if (!visited.has(link) && !queue.includes(link)) queue.push(link);
                 });
+                // console.log('newlinks',newLinks);
+                // console.log('queue',queue);
             }
             await delay(1000);
         }
